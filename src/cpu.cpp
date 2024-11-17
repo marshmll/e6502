@@ -91,11 +91,10 @@ void CPU::execute(DWord cycles)
         }
         case RTS:
         {
-            Word return_addr = readWord(cycles, SP);
-            SP += 2;
-            cycles -= 2;
-            PC = return_addr + 1;
-            cycles--;
+            Word return_addr = readWord(cycles, SP); // Read return address from stack
+            SP += 2;                                 // Decrement stack pointer
+            PC = return_addr + 1;                    // Add 1 to the return address
+            cycles -= 3;                             // Decrement cycle count
 
             break;
         }
