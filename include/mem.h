@@ -7,7 +7,7 @@ class Memory
 private:
     /* MEMORY DATA ================================================================================ */
 
-    BYTE data[MAX_MEM_SIZE]; // Memory data (64 KiB)
+    Byte data[MAX_MEM_SIZE]; // Memory data (64 KiB)
 
 public:
     /* CONSTRUCTOR AND DESTRUCTOR ================================================================= */
@@ -24,21 +24,21 @@ public:
     void init();
 
     /**
-     * @brief Reads a BYTE from memory in a given address.
+     * @brief Reads a Byte from memory in a given address.
      *
      * @param addr The address to read from in memory.
      *
-     * @return const BYTE
+     * @return const Byte
      */
-    const BYTE read(const WORD &addr);
+    const Byte read(const Word &addr);
 
     /**
-     * @brief Writes a BYTE into memory in a given address.
+     * @brief Writes a Byte into memory in a given address.
      *
      * @param addr The address to write into memory
      * @param data The data to write into memory
      *
      * @return void
      */
-    void write(const WORD addr, const BYTE data);
+    void write(const Word addr, const Byte data);
 };

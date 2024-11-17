@@ -9,7 +9,7 @@ int main()
     CPU cpu(memory);
 
     cpu.reset();
-    cpu.execute(2);
+    cpu.execute(14);
 
     cpu.printState();
 
