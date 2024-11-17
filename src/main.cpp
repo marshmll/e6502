@@ -1,8 +1,14 @@
 #include "stdafx.h"
+#include "mem.h"
+#include "cpu.h"
 
 int main()
 {
-    std::cout << "Hello, world!" << "\n";
+    Memory memory;
+    CPU cpu(memory);
+
+    cpu.reset();
+    cpu.run(2);
 
     return 0;
 }
