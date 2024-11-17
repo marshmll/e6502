@@ -2,6 +2,7 @@
 
 #include "sizes.h"
 #include "mem.h"
+#include "instructions.h"
 
 /**
  * @class CPU
@@ -37,10 +38,26 @@ public:
     virtual ~CPU();
 
     /* FUNCTIONS ================================================================================== */
-    
+
+    void printState();
+
+    /**
+     * @brief Sets all register to 0, sets all memory to 0,
+     * Set Program counter to 0xFFFC.
+     *
+     * @return void
+     */
     void reset();
 
-    void run(DWORD cicles);
-    
-    const BYTE fetch(DWORD &cicles);
+    void execute(DWORD cicles);
+
+    /**
+     * @brief Fetches ONE BYTE from the memory pointed by the Program Counter
+     * and increments it. Also decrements the cicle count.
+     *
+     * @param cicles The cicles variable reference.
+     *
+     * @return BYTE
+     */
+    BYTE fetch(DWORD &cicles);
 };

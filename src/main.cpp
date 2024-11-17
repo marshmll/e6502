@@ -5,10 +5,13 @@
 int main()
 {
     Memory memory;
+
     CPU cpu(memory);
 
     cpu.reset();
-    cpu.run(2);
+    cpu.execute(2);
+
+    cpu.printState();
 
     return 0;
 }

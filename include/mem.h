@@ -28,7 +28,17 @@ public:
      *
      * @param addr The address to read from in memory.
      *
-     * @return const BYTE &
+     * @return const BYTE
      */
-    const BYTE &read(const WORD &addr);
+    const BYTE read(const WORD &addr);
+
+    /**
+     * @brief Writes a BYTE into memory in a given address.
+     *
+     * @param addr The address to write into memory
+     * @param data The data to write into memory
+     *
+     * @return void
+     */
+    void write(const WORD addr, const BYTE data);
 };
