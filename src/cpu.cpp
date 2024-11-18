@@ -7,19 +7,25 @@ CPU::~CPU() {}
 
 void CPU::printState()
 {
-    std::cout << "***** CPU STATE *****" << "\n"
-              << "> PC: 0x" << std::hex << PC << "\n"
-              << "> SP: 0x" << std::hex << static_cast<int>(SP) << "\n"
-              << "> A: 0x" << std::hex << static_cast<int>(A) << "\n"
-              << "> X: 0x" << std::hex << static_cast<int>(X) << "\n"
-              << "> Y: 0x" << std::hex << static_cast<int>(Y) << "\n"
-              << "> C: 0x" << std::hex << static_cast<int>(C) << "\n"
-              << "> Z: 0x" << std::hex << static_cast<int>(Z) << "\n"
-              << "> I: 0x" << std::hex << static_cast<int>(I) << "\n"
-              << "> D: 0x" << std::hex << static_cast<int>(D) << "\n"
-              << "> B: 0x" << std::hex << static_cast<int>(B) << "\n"
-              << "> V: 0x" << std::hex << static_cast<int>(V) << "\n"
-              << "> N: 0x" << std::hex << static_cast<int>(N) << "\n";
+    std::cout << "╔═══════════════════════════════╗" << "\n";
+    std::cout << "║           MOS E6502           ║" << "\n";
+    std::cout << "╚═══════════════════════════════╝" << "\n";
+    std::cout << "┌────────────────┬──────────────┐\n";
+    std::cout << "│    Register    │    Value     │\n";
+    std::cout << "├────────────────┼──────────────┤\n";
+    std::cout << std::hex << std::uppercase;
+    std::cout << "│       PC       │     0x" << std::setw(4) << std::setfill('0') << PC << "   │\n";
+    std::cout << "│       SP       │     0x" << std::setw(2) << std::setfill('0') << static_cast<int>(SP) << "     │\n";
+    std::cout << "│       A        │     0x" << std::setw(2) << static_cast<int>(A) << "     │\n";
+    std::cout << "│       X        │     0x" << std::setw(2) << static_cast<int>(X) << "     │\n";
+    std::cout << "│       Y        │     0x" << std::setw(2) << static_cast<int>(Y) << "     │\n";
+    std::cout << "├────────────────┴──────────────┤\n";
+    std::cout << "│             FLAGS             │\n";
+    std::cout << "├───┬───┬───┬───┬───┬───┬───┬───┤\n";
+    std::cout << "│ N │ V │ - │ B │ D │ I │ Z │ C │\n";
+    std::cout << "├───┼───┼───┼───┼───┼───┼───┼───┤\n";
+    std::cout << "│ " << static_cast<int>(N) << " │ " << static_cast<int>(V) << " │ - │ " << static_cast<int>(B) << " │ " << static_cast<int>(D) << " │ " << static_cast<int>(I) << " │ " << static_cast<int>(Z) << " │ " << static_cast<int>(C) << " │\n";
+    std::cout << "└───┴───┴───┴───┴───┴───┴───┴───┘\n";
 }
 
 void CPU::reset()
@@ -35,7 +41,7 @@ void CPU::reset()
     memory.write(0xFFFD, 0xBE);
     memory.write(0xFFFE, 0xB0);
     memory.write(0xB0BE, LDA_IM);
-    memory.write(0xB0BF, 0x69);
+    memory.write(0xB0BF, 0x0);
     memory.write(0xB0C0, RTS);
 }
 
@@ -83,18 +89,19 @@ void CPU::execute(DWord cycles)
         {
             Word subroutine_addr = fetchWord(cycles); // Fetch subroutine address value
             SP -= 2;                                  // Increment stack pointer
-            writeWord(cycles, SP, PC - 1);            // Write PC - 1 into the stack
+            writeWord(cycles, SP + 0x100, PC - 1);    // Write PC - 1 into the stack
             PC = subroutine_addr;                     // Change Program Counter to the subroutine address.
             --cycles;                                 // Decrement cycle count
 
             break;
         }
+        /* RETURN FROM SUBROUTINE ================================================================= */
         case RTS:
         {
-            Word return_addr = readWord(cycles, SP); // Read return address from stack
-            SP += 2;                                 // Decrement stack pointer
-            PC = return_addr + 1;                    // Add 1 to the return address
-            cycles -= 3;                             // Decrement cycle count
+            Word return_addr = readWord(cycles, SP + 0x100); // Read return address from stack
+            SP += 2;                                         // Decrement stack pointer
+            PC = return_addr + 1;                            // Add 1 to the return address
+            cycles -= 3;                                     // Decrement cycle count
 
             break;
         }
