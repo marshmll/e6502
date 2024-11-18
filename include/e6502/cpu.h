@@ -116,7 +116,7 @@ namespace E6502
          */
         void writeWord(int &cycles, const Word &addr, const Word data);
 
-        void setLDAFlags();
+        void setLoadFlags();
 
         void swapBytesInWord(Word &word);
 

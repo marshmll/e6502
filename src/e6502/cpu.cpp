@@ -123,7 +123,7 @@ void E6502::CPU::writeWord(int &cycles, const Word &addr, const Word data)
     cycles -= 2;
 }
 
-void E6502::CPU::setLDAFlags()
+void E6502::CPU::setLoadFlags()
 {
     Z = (Byte)(A == 0);               // Sets zero flag if accumulator is zero.
     N = (Byte)((A & 0b10000000) > 0); // Sets negative flag if seventh bit is 1
