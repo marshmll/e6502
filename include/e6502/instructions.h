@@ -1,7 +1,5 @@
 #pragma once
 
-/* INSTRUCTION OPCODES =========================================================================== */
-
 namespace E6502
 {
     enum Instructions

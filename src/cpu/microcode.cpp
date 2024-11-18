@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "m6502/microcode.h"
+#include "e6502/microcode.h"
 
 void E6502::CPU::execute(int cycles)
 {

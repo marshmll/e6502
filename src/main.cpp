@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "m6502/cpu.h"
+#include "e6502/cpu.h"
 
 int main()
 {

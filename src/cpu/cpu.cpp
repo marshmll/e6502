@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "m6502/cpu.h"
+#include "e6502/cpu.h"
 
 E6502::CPU::CPU(Memory &memory) : memory(memory) {}
 
@@ -30,6 +30,8 @@ void E6502::CPU::printState()
 
 void E6502::CPU::reset()
 {
+    std::cout << "RESETTING..." << "\n";
+
     SP = 0x0FF;                    // Initialize Stack Pointer to 0xFF (0x1FF)
     PC = 0xFFFC;                   // Initialize the reset vector address
     C = Z = I = D = B = V = N = 0; // Clear Flags

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "m6502/instructions.h"
+#include "e6502/instructions.h"
 #include "memory/memory.h"
 
 namespace E6502
