@@ -75,10 +75,9 @@ E6502::Word E6502::CPU::fetchWord(int &cycles)
     data |= (memory.read(PC) << 8);
     ++PC;
 
-// Check for platform endianness
-#ifdef BIG_ENDIAN_PLATFORM
-    swapBytesInWord(data);
-#endif
+    // Check for platform endianness
+    if (BIG_ENDIAN_PLATFORM)
+        swapBytesInWord(data);
 
     cycles -= 2;
 
@@ -105,10 +104,9 @@ E6502::Word E6502::CPU::readWord(int &cycles, const Word &addr)
     // Read last byte into higher part of the variable.
     data |= (memory.read(addr + 1) << 8);
 
-// Check for platform endianness
-#ifdef BIG_ENDIAN_PLATFORM
-    swapBytesInWord(data);
-#endif
+    // Check for platform endianness
+    if (BIG_ENDIAN_PLATFORM)
+        swapBytesInWord(data);
 
     cycles -= 2;
 
