@@ -1,7 +1,9 @@
 #pragma once
 
-using Byte  = unsigned char;    // 0 - 255
-using Word  = unsigned short;   // 0 - 65.535
-using DWord = unsigned int;     // 0 - 4.294.967.295
+#include <cstdint>
+
+using Byte = u_int8_t;   // 0 - 255
+using Word = u_int16_t;  // 0 - 65.535
+using DWord = u_int32_t; // 0 - 4.294.967.295
 
 static constexpr DWord MAX_MEM_SIZE = 1024 * 64;

@@ -37,12 +37,10 @@ void CPU::reset()
 
     memory.init(); // Initialize memory
 
-    memory.write(0xFFFC, JSR);
+    memory.write(0xFFFC, LDA_AX);
     memory.write(0xFFFD, 0xBE);
     memory.write(0xFFFE, 0xB0);
-    memory.write(0xB0BE, LDA_IM);
-    memory.write(0xB0BF, 0x0);
-    memory.write(0xB0C0, RTS);
+    memory.write(0xB0BE, 0x77);
 }
 
 void CPU::execute(DWord cycles)
@@ -76,11 +74,41 @@ void CPU::execute(DWord cycles)
         {
             Byte zero_page_addr = fetchByte(cycles); // Fetch zero page address value
             zero_page_addr += X;                     // Add the value in reg. X into the address.
+            cycles--;                                // Decrement cicle count
+            A = readByte(cycles, zero_page_addr);    // Copies the value read from the address into A
+            setLDAFlags();                           // Set Flags as appropriate
 
-            cycles--; // Decrement cicle count
+            break;
+        }
+        /* LOAD ACCUMULATOR ABSOLUTE ============================================================== */
+        case LDA_AB:
+        {
+            Word abs_addr = fetchWord(cycles); // Fetch the 16 bit absolute address
+            A = readByte(cycles, abs_addr);    // Read the value at the address into A
 
-            A = readByte(cycles, zero_page_addr); // Copies the value read from the address into A
-            setLDAFlags();                        // Set Flags as appropriate
+            break;
+        }
+        /* LOAD ACCUMULATOR ABSOLUTE X ============================================================ */
+        case LDA_AX:
+        {
+            Word abs_addr = fetchWord(cycles);    // Fetch the 16 bit absolute address
+            Word prev_addr = abs_addr;            // Save the original address
+            abs_addr += X;                        // Add the contents of X into the address
+            A = readByte(cycles, abs_addr);       // Store the value at the address into A
+            if (pageCrossed(prev_addr, abs_addr)) // If page crossed, i.e, changed the highest bit in the
+                --cycles;                         // address
+
+            break;
+        }
+        /* LOAD ACCUMULATOR ABSOLUTE y ============================================================ */
+        case LDA_AY:
+        {
+            Word abs_addr = fetchWord(cycles);    // Fetch the 16 bit absolute address
+            Word prev_addr = abs_addr;            // Save the original address
+            abs_addr += Y;                        // Add the contents of Y into the address
+            A = readByte(cycles, abs_addr);       // Store the value at the address into A
+            if (pageCrossed(prev_addr, abs_addr)) // If page crossed, i.e, changed the highest bit in the
+                --cycles;                         // address
 
             break;
         }
@@ -108,7 +136,8 @@ void CPU::execute(DWord cycles)
         default:
         {
             std::cout << "UNKNOWN INSTRUCTION: 0x" << std::hex << static_cast<int>(ins) << " FROM ADDRESS 0x" << std::hex << (int)PC << "\n";
-            break;
+            std::cout << "ABORTING WITH " << std::dec << cycles << " REMAINING." << "\n";
+            return;
         }
         }
     }
@@ -197,4 +226,11 @@ void CPU::swapBytesInWord(Word &word)
     word << 8;
     word &= 0xFF00;
     word |= (tmp >> 8);
+}
+
+const bool CPU::pageCrossed(const Word &prev_addr, const Word &curr_addr)
+{
+    Byte previous_page = static_cast<Byte>(prev_addr >> 8); // Save the previous page
+    Byte current_page = static_cast<Byte>(curr_addr >> 8);  // Save the current page
+    return previous_page < current_page;
 }

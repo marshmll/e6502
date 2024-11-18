@@ -108,4 +108,6 @@ public:
     void setLDAFlags();
 
     void swapBytesInWord(Word &word);
+
+    const bool pageCrossed(const Word &prev_addr, const Word &curr_addr);
 };
