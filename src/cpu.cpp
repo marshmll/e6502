@@ -91,12 +91,11 @@ void CPU::execute(DWord cycles)
         /* LOAD ACCUMULATOR ABSOLUTE X ============================================================ */
         case LDA_AX:
         {
-            Word abs_addr = fetchWord(cycles);    // Fetch the 16 bit absolute address
-            Word prev_addr = abs_addr;            // Save the original address
-            abs_addr += X;                        // Add the contents of X into the address
-            A = readByte(cycles, abs_addr);       // Store the value at the address into A
-            if (pageCrossed(prev_addr, abs_addr)) // If page crossed, i.e, changed the highest bit in the
-                --cycles;                         // address
+            Word abs_addr = fetchWord(cycles);       // Fetch the 16 bit absolute address
+            abs_addr += X;                           // Add the contents of X into the address
+            A = readByte(cycles, abs_addr);          // Store the value at the address into A
+            if (pageCrossed(abs_addr - X, abs_addr)) // If page crossed, i.e, changed the highest bit in the
+                --cycles;                            // address
 
             break;
         }
@@ -109,6 +108,33 @@ void CPU::execute(DWord cycles)
             A = readByte(cycles, abs_addr);       // Store the value at the address into A
             if (pageCrossed(prev_addr, abs_addr)) // If page crossed, i.e, changed the highest bit in the
                 --cycles;                         // address
+
+            break;
+        }
+        /* LOAD ACCUMULATOR INDIRECT X ============================================================ */
+        case LDA_IX:
+        {
+            Byte base_pointer = fetchByte(cycles);               // Fetch the base pointer
+            base_pointer += X;                                   // Add the contents of X into the base pointer
+            Word zero_page_addr = 0;                             // Set the low bytes of the address as the
+            zero_page_addr |= base_pointer;                      // base pointer.
+            Word target_addr = readWord(cycles, zero_page_addr); // Read the target address from zero page address
+            A = readByte(cycles, target_addr);                   // Store the contents in memory at the address into A.
+            --cycles;                                            // Decrement cycle count
+
+            break;
+        }
+        /* LOAD ACCUMULATOR ABSOLUTE y ============================================================ */
+        case LDA_IY:
+        {
+            Byte base_pointer = fetchByte(cycles);               // Fetch the base pointer
+            Word zero_page_addr = 0;                             // Set the low bytes of the address as the
+            zero_page_addr |= base_pointer;                      // base pointer
+            Word target_addr = readWord(cycles, zero_page_addr); // Read the target address from zero page address
+            target_addr += Y;                                    // Add the Y register to the target address
+            A = readByte(cycles, target_addr);                   // Load the contents in memory at the address into A
+            if (pageCrossed(target_addr - Y, target_addr))       // Add carry cycle if target adress page crossed
+                --cycles;
 
             break;
         }
