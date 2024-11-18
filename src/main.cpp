@@ -1,16 +1,13 @@
 #include "stdafx.h"
-#include "mem.h"
-#include "cpu.h"
+#include "m6502/cpu.h"
 
 int main()
 {
-    Memory memory;
-
-    CPU cpu(memory);
+    E6502::Memory memory;
+    E6502::CPU cpu(memory);
 
     cpu.reset();
-    cpu.execute(4);
-
+    cpu.execute(15);
     cpu.printState();
 
     return 0;

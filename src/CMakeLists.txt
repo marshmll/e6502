@@ -1,5 +1,6 @@
 target_sources(e6502 PRIVATE
-    ./cpu.cpp
-    ./mem.cpp
+    ./cpu/cpu.cpp
+    ./cpu/microcode.cpp
+    ./memory/memory.cpp
     ./main.cpp
 )
