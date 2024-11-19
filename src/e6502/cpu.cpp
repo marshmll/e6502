@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "e6502/cpu.h"
 
-E6502::CPU::CPU(Memory &memory) : memory(memory) {}
+E6502::CPU::CPU(Memory &memory) : memory(memory) { initLookupTables(); }
 
 E6502::CPU::~CPU() {}
 
@@ -39,7 +39,7 @@ void E6502::CPU::reset()
 
     memory.init(); // Initialize memory
 
-    memory.write(0xFFFC, 0b10001100);
+    memory.write(0xFFFC, 0b01000001);
 }
 
 E6502::Byte E6502::CPU::fetchByte(int &cycles)

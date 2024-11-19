@@ -9,8 +9,8 @@ void E6502::CPU::execute(int cycles)
 
         std::cout << "opcode: " << std::hex << static_cast<int>(opcode) << "\n";
 
-        std::cout << "instruction: " << std::dec << decodeInstruction(opcode) << "\n"
-                  << "addressing mode: " << decodeAddressingMode(opcode) << "\n";
+        std::cout << "instruction: " << std::dec << lookupForInstruction(opcode) << "\n"
+                  << "addressing mode: " << lookupForAddrMode(opcode) << "\n";
 
         //     switch (ins)
         //     {
