@@ -39,17 +39,7 @@ void E6502::CPU::reset()
 
     memory.init(); // Initialize memory
 
-    memory.write(0x0010, 0x70);
-    memory.write(0x0011, 0x80);
-    memory.write(0x8070, 0x69);
-    memory.write(0xFFFC, JMP_AB);
-    memory.write(0xFFFD, 0x0B);
-    memory.write(0xFFFE, 0xB0);
-    memory.write(0xB00B, LDA_IX);
-    memory.write(0xB00C, 0x10);
-    memory.write(0xB00D, JMP_AB);
-    memory.write(0xB00E, 0x0D);
-    memory.write(0xB00F, 0xB0);
+    memory.write(0xFFFC, LDA_IM);
 }
 
 E6502::Byte E6502::CPU::fetchByte(int &cycles)
