@@ -1,15 +1,16 @@
 #include "stdafx.h"
-#include "e6502/microcode.h"
+#include "e6502/execute.h"
 
 void E6502::CPU::execute(int cycles)
 {
     while (cycles > 0)
     {
-        Byte ins = fetchByte(cycles);
+        Byte opcode = fetchByte(cycles);
 
-        std::cout << "instruction: " << std::hex << static_cast<int>(ins) << "\n";
+        std::cout << "opcode: " << std::hex << static_cast<int>(opcode) << "\n";
 
-        AddressingModes addr_mode = decodeAddressingMode(ins);
+        std::cout << "instruction: " << std::dec << decodeInstruction(opcode) << "\n"
+                  << "addressing mode: " << decodeAddressingMode(opcode) << "\n";
 
         //     switch (ins)
         //     {

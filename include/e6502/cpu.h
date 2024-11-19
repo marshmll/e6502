@@ -1,6 +1,6 @@
 #pragma once
 
-#include "e6502/addrmodes.h"
+#include "e6502/decode.h"
 #include "e6502/instructions.h"
 #include "memory/memory.h"
 

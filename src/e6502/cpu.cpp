@@ -39,7 +39,7 @@ void E6502::CPU::reset()
 
     memory.init(); // Initialize memory
 
-    memory.write(0xFFFC, LDA_IM);
+    memory.write(0xFFFC, 0b10001100);
 }
 
 E6502::Byte E6502::CPU::fetchByte(int &cycles)
