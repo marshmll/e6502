@@ -174,11 +174,6 @@ namespace E6502
         Instructions instruction;
     };
 
-    static const std::vector<Instructions> uniqueInstructions = {
-        BCC, BCS, BEQ, BMI, BNE, BPL, BRK, BVC, BVS, CLC, CLD, CLI,
-        CLV, DEX, DEY, INX, INY, JMP, JSR, NOP, PHA, PHP, PLA, PLP,
-        RTI, RTS, SEC, SED, SEI, TAX, TAY, TSX, TXA, TXS, TYA};
-
     static const std::vector<InstructionMask> instructionMasks = {
         // Instructions with bitmask logic
         {ADC_ZEROS_BITMASK, ADC_ONES_BITMASK, ADC},

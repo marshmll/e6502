@@ -3,13 +3,15 @@
 
 void E6502::initLookupTables()
 {
-    for (int opcode = 0; opcode < 256; ++opcode)
+    for (int i = 0; i < 256; ++i)
     {
-        Instructions instruction = decodeInstruction(static_cast<Byte>(opcode));
-        AddressingModes addr_mode = decodeAddressingMode(static_cast<Byte>(opcode));
+        const Byte opcode = static_cast<Byte>(i);
 
-        instructionLookupTable[static_cast<Byte>(opcode)] = instruction;
-        addrLookupTable[static_cast<Byte>(opcode)] = addr_mode;
+        Instructions instruction = decodeInstruction(opcode);
+        AddressingModes addr_mode = decodeAddressingMode(opcode);
+
+        instructionLookupTable[opcode] = instruction;
+        addrLookupTable[opcode] = addr_mode;
     }
 }
 
