@@ -19,6 +19,10 @@ namespace E6502
 
         void BCCHandler(CPU &cpu, const AddressingModes &addr_mode);
 
+        void BCSHandler(CPU &cpu, const AddressingModes &addr_mode);
+
+        void BEQHandler(CPU &cpu, const AddressingModes &addr_mode);
+
         void LDAHandler(CPU &cpu, const AddressingModes &addr_mode);
 
         void LDXHandler(CPU &cpu, const AddressingModes &addr_mode);
@@ -33,6 +37,8 @@ namespace E6502
 
         const Byte performOperation(CPU &cpu, const AddressingModes &addr_mode, std::function<void(CPU &, const Byte &)> operation);
 
+        void branchHandler(CPU &cpu, const AddressingModes &addr_mode, const bool condition);
+
         void invalidHandler();
     };
 
@@ -41,6 +47,8 @@ namespace E6502
         {AND, InstructionHandler(&InstructionHandlers::ANDHandler)},
         {ASL, InstructionHandler(&InstructionHandlers::ASLHandler)},
         {BCC, InstructionHandler(&InstructionHandlers::BCCHandler)},
+        {BCS, InstructionHandler(&InstructionHandlers::BCSHandler)},
+        {BEQ, InstructionHandler(&InstructionHandlers::BEQHandler)},
         {LDA, InstructionHandler(&InstructionHandlers::LDAHandler)},
         {LDX, InstructionHandler(&InstructionHandlers::LDXHandler)},
         {LDY, InstructionHandler(&InstructionHandlers::LDYHandler)},

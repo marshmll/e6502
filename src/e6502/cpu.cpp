@@ -45,7 +45,7 @@ void E6502::CPU::reset()
     memory.init(); // Initialize memory
 
     memory.write(0xFFFC, BCC_RELATIVE);
-    memory.write(0xFFFD, -2);
+    memory.write(0xFFFD, 0xFE);
 }
 
 /* INSTRUCTION FETCH FUNCTIONS ==================================================================== */
@@ -139,7 +139,7 @@ const bool E6502::CPU::pageCrossed(const Word &prev_addr, const Word &curr_addr)
 {
     Byte previous_page = static_cast<Byte>(prev_addr >> 8); // Save the previous page
     Byte current_page = static_cast<Byte>(curr_addr >> 8);  // Save the current page
-    return previous_page < current_page;
+    return previous_page != current_page;
 }
 
 /* FLAGS FUNCTIONS ================================================================================ */
