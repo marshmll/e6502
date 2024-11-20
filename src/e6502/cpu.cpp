@@ -28,7 +28,7 @@ void E6502::CPU::printState()
     std::cout << "├───┬───┬───┬───┬───┬───┬───┬───┤\n";
     std::cout << "│ N │ V │ - │ B │ D │ I │ Z │ C │\n";
     std::cout << "├───┼───┼───┼───┼───┼───┼───┼───┤\n";
-    std::cout << "│ " << static_cast<int>((P & 0b10000000) == 0b10000000) << " │ " << static_cast<int>((P & 0b01000000) == 0b01000000) << " │ - │ " << static_cast<int>((P & 0b00010000) == 0b00010000) << " │ " << static_cast<int>((P & 0b00001000) == 0b00001000) << " │ " << static_cast<int>((P & 0b00000100) == 0b00000100) << " │ " << static_cast<int>((P & 0b00000010) == 0b00000010) << " │ " << static_cast<int>((P & 0b00000001) == 0b00000001) << " │\n";
+    std::cout << "│ " << static_cast<int>((P & NEGATIVE_FLAG) == NEGATIVE_FLAG) << " │ " << static_cast<int>((P & OVERFLOW_FLAG) == OVERFLOW_FLAG) << " │ - │ " << static_cast<int>((P & BREAK_FLAG) == BREAK_FLAG) << " │ " << static_cast<int>((P & DECIMAL_FLAG) == DECIMAL_FLAG) << " │ " << static_cast<int>((P & INTERRUPT_FLAG) == INTERRUPT_FLAG) << " │ " << static_cast<int>((P & ZERO_FLAG) == ZERO_FLAG) << " │ " << static_cast<int>((P & CARRY_FLAG) == CARRY_FLAG) << " │\n";
     std::cout << "└───┴───┴───┴───┴───┴───┴───┴───┘\n";
 }
 /* EXECUTION FUNCTIONS ============================================================================ */
@@ -45,9 +45,10 @@ void E6502::CPU::reset()
     memory.init(); // Initialize memory
 
     memory.write(0x2000, 0x69);
-    memory.write(0xFFFC, 0b10101100);
-    memory.write(0xFFFD, 0x00);
-    memory.write(0xFFFE, 0x20);
+    memory.write(0xFFFC, 0b10101001);
+    memory.write(0xFFFD, 0x36);
+    memory.write(0xFFFE, 0b00101001);
+    memory.write(0xFFFF, 0x2B);
 }
 
 /* INSTRUCTION FETCH FUNCTIONS ==================================================================== */
@@ -95,6 +96,12 @@ E6502::Byte E6502::CPU::readByte(const Word &addr)
     return data;
 }
 
+void E6502::CPU::writeByte(const Word &addr, const Byte data)
+{
+    memory.write(addr, data);
+    ++clkCycles;
+}
+
 E6502::Word E6502::CPU::readWord(const Word &addr)
 {
     /* IMPORTANT: 6502 IS LITTLE ENDIAN! */
@@ -140,11 +147,73 @@ const bool E6502::CPU::pageCrossed(const Word &prev_addr, const Word &curr_addr)
 
 /* FLAGS FUNCTIONS ================================================================================ */
 
-void E6502::CPU::setLoadFlags(const Byte &reg)
+void E6502::CPU::setADCFlags(const Byte &operand, const Byte &previous_A_value)
+{
+    // If result is bigger than a Byte, set carry flag.
+    if ((previous_A_value + operand + (P & CARRY_FLAG)) > 255)
+        P |= CARRY_FLAG; // Set carry flag to 1.
+    else if ((P & CARRY_FLAG))
+        P ^= CARRY_FLAG; // Toggle carry flag.
+
+    // If the result is zero, set carry flag.
+    if (A == 0)
+        P |= ZERO_FLAG;
+    else if ((P & ZERO_FLAG))
+        P ^= ZERO_FLAG;
+
+    // If the result has 7th bit set, set negative flag.
+    if ((A & NEGATIVE_FLAG))
+        P |= NEGATIVE_FLAG;
+    else if ((P & NEGATIVE_FLAG))
+        P ^= NEGATIVE_FLAG;
+
+    // If the addition of two numbers with same signal result in a number
+    // with the opposite sign, set overflow flag
+    if (((operand & NEGATIVE_FLAG) == 0 && (previous_A_value & NEGATIVE_FLAG) == 0 && (A & NEGATIVE_FLAG) != 0) ||
+        ((operand & NEGATIVE_FLAG) != 0 && (previous_A_value & NEGATIVE_FLAG) != 0 && (A & NEGATIVE_FLAG) == 0))
+        P |= OVERFLOW_FLAG;
+    else if ((P & OVERFLOW_FLAG))
+        P ^= OVERFLOW_FLAG;
+}
+
+void E6502::CPU::setZeroAndNegativeFlags(const Byte &reg)
 {
     if (reg == 0)
-        P |= 0b00000010; // Sets zero flag if accumulator is zero.
+        P |= ZERO_FLAG; // Sets zero flag if accumulator is zero.
+    else if ((P & ZERO_FLAG))
+        P ^= ZERO_FLAG;
 
-    if (reg & 0b10000000) // Sets negative flag if seventh bit is 1
-        P |= 0b10000000;
+    if (reg & NEGATIVE_FLAG) // Sets negative flag if seventh bit is 1
+        P |= NEGATIVE_FLAG;
+    else if ((P & NEGATIVE_FLAG))
+        P ^= NEGATIVE_FLAG;
+}
+
+void E6502::CPU::setSBCFlags(const Byte &operand, const Byte &previous_A_value)
+{
+    // If result is greater or equal 0, set carry flag.
+    if ((previous_A_value - operand - (P & CARRY_FLAG)) >= 0)
+        P |= CARRY_FLAG; // Set carry flag to 1.
+    else if ((P & CARRY_FLAG))
+        P ^= CARRY_FLAG; // Clear carry flag.
+
+    // If the result is zero, set zero flag.
+    if (A == 0)
+        P |= ZERO_FLAG;
+    else if ((P & ZERO_FLAG))
+        P ^= ZERO_FLAG;
+
+    // If the result has 7th bit set, set negative flag.
+    if ((A & NEGATIVE_FLAG))
+        P |= NEGATIVE_FLAG;
+    else if ((P & NEGATIVE_FLAG))
+        P ^= NEGATIVE_FLAG;
+
+    // If the subtraction of a negative minus a positive equais a positive or
+    // a positive minus a negative equais a negative, set overflow flag.
+    if (((previous_A_value & NEGATIVE_FLAG) != 0 && (operand & NEGATIVE_FLAG) == 0 && (A & NEGATIVE_FLAG) == 0) ||
+        ((previous_A_value & NEGATIVE_FLAG) == 0 && (operand & NEGATIVE_FLAG) != 0 && (A & NEGATIVE_FLAG) != 0))
+        P |= OVERFLOW_FLAG;
+    else if ((P & OVERFLOW_FLAG))
+        P ^= OVERFLOW_FLAG;
 }

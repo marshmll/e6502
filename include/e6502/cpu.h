@@ -6,6 +6,15 @@
 
 namespace E6502
 {
+    /* PROCESSOR STATUS FLAGS BITMASKS */
+    constexpr Byte NEGATIVE_FLAG = 0b10000000,
+                   OVERFLOW_FLAG = 0b01000000,
+                   BREAK_FLAG = 0b00010000,
+                   DECIMAL_FLAG = 0b00001000,
+                   INTERRUPT_FLAG = 0b00000100,
+                   ZERO_FLAG = 0b00000010,
+                   CARRY_FLAG = 0b00000001;
+
     /**
      * @class CPU
      *
@@ -85,15 +94,26 @@ namespace E6502
 
         /**
          * @brief Reads ONE Byte from a given memory address.
-         * Decrements the cycle count by 1, but DOES NOT INCREMENT PROGRAM COUNTER.
+         * Increments the cycle count by 1, but DOES NOT INCREMENT PROGRAM COUNTER.
          *
          * @return Byte
          */
         Byte readByte(const Word &addr);
 
         /**
+         * @brief Writes ONE Byte of data on a given address
+         * in memory. Increments cycle count by 1.
+         *
+         * @param addr The memory address to write into.
+         * @param data The data to write into memory.
+         *
+         * @return void
+         */
+        void writeByte(const Word &addr, const Byte data);
+
+        /**
          * @brief Reads ONE Word (two Bytes) from a given memory address.
-         * Decrements the cycle count by 2, but DOES NOT INCREMENT PROGRAM COUNTER.
+         * Increments the cycle count by 2, but DOES NOT INCREMENT PROGRAM COUNTER.
          * @param addr The memory address to read from
          *
          * @return Word
@@ -102,7 +122,7 @@ namespace E6502
 
         /**
          * @brief Writes ONE Word (two Bytes) of data on a given address
-         * in memory. Decrements cycle count by 2.
+         * in memory. Increments cycle count by 2.
          *
          * @param addr The memory address to write into.
          * @param data The data to write into memory.
@@ -144,6 +164,11 @@ namespace E6502
          *
          * @return void
          */
-        void setLoadFlags(const Byte &reg);
+
+        void setADCFlags(const Byte &operand, const Byte &previous_A_value);
+
+        void setZeroAndNegativeFlags(const Byte &reg);
+
+        void setSBCFlags(const Byte &operand, const Byte &previous_A_value);
     };
 }

@@ -5,28 +5,43 @@
 
 namespace E6502
 {
-    using InstructionHandler = std::function<void(E6502::CPU &, const E6502::AddressingModes &)>;
+    using InstructionHandler = std::function<void(CPU &, const AddressingModes &)>;
 
     namespace InstructionHandlers
     {
         /* INSTRUCTION SPECIFIC HANDLERS ========================================================== */
 
-        void LDAHandler(E6502::CPU &cpu, const E6502::AddressingModes &addr_mode);
+        void ADCHandler(CPU &cpu, const AddressingModes &addr_mode);
 
-        void LDXHandler(E6502::CPU &cpu, const E6502::AddressingModes &addr_mode);
+        void ANDHandler(CPU &cpu, const AddressingModes &addr_mode);
 
-        void LDYHandler(E6502::CPU &cpu, const E6502::AddressingModes &addr_mode);
+        void ASLHandler(CPU &cpu, const AddressingModes &addr_mode);
+
+        void LDAHandler(CPU &cpu, const AddressingModes &addr_mode);
+
+        void LDXHandler(CPU &cpu, const AddressingModes &addr_mode);
+
+        void LDYHandler(CPU &cpu, const AddressingModes &addr_mode);
+
+        void SBCHandler(CPU &cpu, const AddressingModes &addr_mode);
 
         /* GENERIC HANDLERS ======================================================================= */
 
-        void loadInstructionHandler(E6502::CPU &cpu, const E6502::AddressingModes &addr_mode, E6502::Byte &reg);
+        const Byte getOperand(CPU &cpu, const AddressingModes &addr_mode);
+
+        const Byte performOperation(CPU &cpu, const AddressingModes &addr_mode, std::function<void(CPU &, const Byte &)> operation);
 
         void invalidHandler();
     };
 
     static std::unordered_map<Instructions, InstructionHandler> handlersTable = {
+        {ADC, InstructionHandler(&InstructionHandlers::ADCHandler)},
+        {AND, InstructionHandler(&InstructionHandlers::ANDHandler)},
+        {ASL, InstructionHandler(&InstructionHandlers::ASLHandler)},
         {LDA, InstructionHandler(&InstructionHandlers::LDAHandler)},
         {LDX, InstructionHandler(&InstructionHandlers::LDXHandler)},
-        {LDY, InstructionHandler(&InstructionHandlers::LDYHandler)}};
+        {LDY, InstructionHandler(&InstructionHandlers::LDYHandler)},
+        {SBC, InstructionHandler(&InstructionHandlers::SBCHandler)},
+    };
 
 };
