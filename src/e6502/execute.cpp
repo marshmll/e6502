@@ -5,6 +5,8 @@ void E6502::CPU::execute(int cycles)
 {
     while (clkCycles < cycles)
     {
+        std::cout << "PC: " << std::hex << "0x" << PC << "\n";
+
         Byte opcode = fetchByte();
 
         std::cout << "opcode: 0x" << std::hex << static_cast<int>(opcode) << "\n";

@@ -17,6 +17,8 @@ namespace E6502
 
         void ASLHandler(CPU &cpu, const AddressingModes &addr_mode);
 
+        void BCCHandler(CPU &cpu, const AddressingModes &addr_mode);
+
         void LDAHandler(CPU &cpu, const AddressingModes &addr_mode);
 
         void LDXHandler(CPU &cpu, const AddressingModes &addr_mode);
@@ -38,6 +40,7 @@ namespace E6502
         {ADC, InstructionHandler(&InstructionHandlers::ADCHandler)},
         {AND, InstructionHandler(&InstructionHandlers::ANDHandler)},
         {ASL, InstructionHandler(&InstructionHandlers::ASLHandler)},
+        {BCC, InstructionHandler(&InstructionHandlers::BCCHandler)},
         {LDA, InstructionHandler(&InstructionHandlers::LDAHandler)},
         {LDX, InstructionHandler(&InstructionHandlers::LDXHandler)},
         {LDY, InstructionHandler(&InstructionHandlers::LDYHandler)},

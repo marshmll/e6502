@@ -76,7 +76,7 @@ namespace E6502
 
         /**
          * @brief Fetches ONE Byte from the memory pointed by the Program Counter
-         * and increments it by 1. Also decrements the cycle count by 1.
+         * and increments it by 1. Also increments the cycle count by 1.
          *
          * @return Byte
          */
@@ -84,7 +84,7 @@ namespace E6502
 
         /**
          * @brief Fetches ONE Word (two Bytes) from the memory pointed by the Program
-         * Counter and increments it by 2. Also decrements the cycle count by 2.
+         * Counter and increments it by 2. Also increments the cycle count by 2.
          *
          * @return Word
          */

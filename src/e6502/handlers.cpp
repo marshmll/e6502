@@ -94,6 +94,26 @@ void E6502::InstructionHandlers::ASLHandler(CPU &cpu, const AddressingModes &add
     cpu.setZeroAndNegativeFlags(cpu.A);
 }
 
+void E6502::InstructionHandlers::BCCHandler(CPU &cpu, const AddressingModes &addr_mode)
+{
+    if ((cpu.P & CARRY_FLAG) == 0)
+    {
+        Byte offset = cpu.fetchByte();
+
+        if ((offset & 0b10000000) != 0)
+        {
+            // Take the two's complement.
+            offset = ~offset;
+            offset += 0b00000001;
+            cpu.PC -= offset;
+        }
+        else
+        {
+            cpu.PC += offset;
+        }
+    }
+}
+
 void E6502::InstructionHandlers::LDAHandler(CPU &cpu, const AddressingModes &addr_mode)
 {
     performOperation(cpu, addr_mode, [&](CPU &cpu, const Byte &operand)
