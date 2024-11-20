@@ -44,8 +44,8 @@ void E6502::CPU::reset()
 
     memory.init(); // Initialize memory
 
-    memory.write(0xFFFC, 0b10010000);
-    memory.write(0xFFFD, 0b11111110);
+    memory.write(0xFFFC, BCC_RELATIVE);
+    memory.write(0xFFFD, -2);
 }
 
 /* INSTRUCTION FETCH FUNCTIONS ==================================================================== */
