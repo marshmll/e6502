@@ -7,7 +7,7 @@ int main()
     E6502::CPU cpu(memory);
 
     cpu.reset();
-    cpu.execute(1);
+    cpu.execute(4);
     cpu.printState();
 
     return 0;

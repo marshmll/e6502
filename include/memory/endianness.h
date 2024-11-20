@@ -19,3 +19,5 @@
 #else
 #error "I have no idea of what platform is this!"
 #endif
+
+#define IS_BIG_ENDIAN_PLATFORM BIG_ENDIAN_PLATFORM

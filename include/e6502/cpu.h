@@ -1,8 +1,8 @@
 #pragma once
 
-#include "e6502/instructions.h"
-#include "e6502/decode.h"
 #include "memory/memory.h"
+#include "e6502/decode.h"
+#include "e6502/instructions.h"
 
 namespace E6502
 {
@@ -13,11 +13,16 @@ namespace E6502
      */
     class CPU
     {
+    public:
+        /* MEMORY BUS ============================================================================= */
 
-    private:
         Memory &memory;
 
-        /* REGISTERS ================================================================================== */
+        /* CLOCK ================================================================================== */
+
+        long unsigned int clkCycles;
+
+        /* REGISTERS ============================================================================== */
 
         Word PC; // Program Counter Register
         Byte SP; // Stack Pointer Register
@@ -25,24 +30,19 @@ namespace E6502
         Byte A; // Accumulator Register
         Byte X; // Index Register X
         Byte Y; // Index Register Y
+        Byte P; // Processor Status Register (+) | N | V | - | B | D | I | Z | C | (-)
 
-        Byte C : 1; // Carry Flag
-        Byte Z : 1; // Zero Flag
-        Byte I : 1; // Interrupt Disable
-        Byte D : 1; // Decimal Mode
-        Byte B : 1; // Break Command
-        Byte V : 1; // Overflow Flag
-        Byte N : 1; // Negative Flag
-    public:
-        /* CONSTRUCTOR AND DESTRUCTOR ================================================================= */
+        /* CONSTRUCTOR AND DESTRUCTOR ============================================================= */
 
         CPU(Memory &memory);
 
         virtual ~CPU();
 
-        /* FUNCTIONS ================================================================================== */
+        /* DEBUG FUNCTIONS ======================================================================== */
 
         void printState();
+
+        /* EXECUTION FUNCTIONS ==================================================================== */
 
         /**
          * @brief Sets all register to 0, sets all memory to 0,
@@ -58,69 +58,92 @@ namespace E6502
          *
          * @attention Implementation is in microcode.cpp file.
          *
-         * @param cycles The amount of cycles to execute.
          *
          * @return void
          */
         void execute(int cycles);
 
+        /* INSTRUCTION FETCH FUNCTIONS ============================================================ */
+
         /**
          * @brief Fetches ONE Byte from the memory pointed by the Program Counter
          * and increments it by 1. Also decrements the cycle count by 1.
          *
-         * @param cycles The cycles variable reference.
-         *
          * @return Byte
          */
-        Byte fetchByte(int &cycles);
+        Byte fetchByte();
 
         /**
          * @brief Fetches ONE Word (two Bytes) from the memory pointed by the Program
          * Counter and increments it by 2. Also decrements the cycle count by 2.
          *
-         * @param cycles The cycles variable reference.
-         *
          * @return Word
          */
-        Word fetchWord(int &cycles);
+        Word fetchWord();
+
+        /* MEMORY I/O FUNCTIONS =================================================================== */
 
         /**
          * @brief Reads ONE Byte from a given memory address.
          * Decrements the cycle count by 1, but DOES NOT INCREMENT PROGRAM COUNTER.
          *
-         * @param cycles The cycles variable reference.
-         *
          * @return Byte
          */
-        Byte readByte(int &cycles, const Word &addr);
+        Byte readByte(const Word &addr);
 
         /**
          * @brief Reads ONE Word (two Bytes) from a given memory address.
          * Decrements the cycle count by 2, but DOES NOT INCREMENT PROGRAM COUNTER.
-         *
-         * @param cycles The cycles variable reference.
          * @param addr The memory address to read from
          *
          * @return Word
          */
-        Word readWord(int &cycles, const Word &addr);
+        Word readWord(const Word &addr);
 
         /**
          * @brief Writes ONE Word (two Bytes) of data on a given address
          * in memory. Decrements cycle count by 2.
          *
-         * @param cycles The cycles variable reference.
          * @param addr The memory address to write into.
          * @param data The data to write into memory.
          *
          * @return void
          */
-        void writeWord(int &cycles, const Word &addr, const Word data);
+        void writeWord(const Word &addr, const Word data);
 
-        void setLoadFlags();
-
+        /**
+         * @brief Swaps the upper and lower bytes in a Word.
+         *
+         * @param word A word reference.
+         *
+         * @return void.
+         */
         void swapBytesInWord(Word &word);
 
+        /**
+         * @brief Check if the upper byte (page) has changed. If so,
+         * then the page has crossed.
+         *
+         * @param prev_addr The previous address to compare if page crossed
+         * @param curr_addr The current address to compare if page crossed
+         *
+         * @return const bool
+         */
         const bool pageCrossed(const Word &prev_addr, const Word &curr_addr);
+
+        /* FLAG FUNCTIONS ========================================================================= */
+
+        /**
+         * @brief Sets Z (zero) and N (negative) flags when loading
+         * values into a register.
+         * @attention Sets Z to 1 when loaded a zero value.
+         * @attention Sets N to 1 when the seventh bit of the value
+         * is 1.
+         *
+         * @param reg The register to check.
+         *
+         * @return void
+         */
+        void setLoadFlags(const Byte &reg);
     };
 }

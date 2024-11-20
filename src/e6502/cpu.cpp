@@ -1,9 +1,13 @@
 #include "stdafx.h"
 #include "e6502/cpu.h"
 
-E6502::CPU::CPU(Memory &memory) : memory(memory) { initLookupTables(); }
+/* CONSTRUCTOR AND DESTRUCTOR ===================================================================== */
+
+E6502::CPU::CPU(Memory &memory) : memory(memory), clkCycles(0) { initLookupTables(); }
 
 E6502::CPU::~CPU() {}
+
+/* DEBUG FUNCTIONS ================================================================================ */
 
 void E6502::CPU::printState()
 {
@@ -24,35 +28,41 @@ void E6502::CPU::printState()
     std::cout << "├───┬───┬───┬───┬───┬───┬───┬───┤\n";
     std::cout << "│ N │ V │ - │ B │ D │ I │ Z │ C │\n";
     std::cout << "├───┼───┼───┼───┼───┼───┼───┼───┤\n";
-    std::cout << "│ " << static_cast<int>(N) << " │ " << static_cast<int>(V) << " │ - │ " << static_cast<int>(B) << " │ " << static_cast<int>(D) << " │ " << static_cast<int>(I) << " │ " << static_cast<int>(Z) << " │ " << static_cast<int>(C) << " │\n";
+    std::cout << "│ " << static_cast<int>((P & 0b10000000) == 0b10000000) << " │ " << static_cast<int>((P & 0b01000000) == 0b01000000) << " │ - │ " << static_cast<int>((P & 0b00010000) == 0b00010000) << " │ " << static_cast<int>((P & 0b00001000) == 0b00001000) << " │ " << static_cast<int>((P & 0b00000100) == 0b00000100) << " │ " << static_cast<int>((P & 0b00000010) == 0b00000010) << " │ " << static_cast<int>((P & 0b00000001) == 0b00000001) << " │\n";
     std::cout << "└───┴───┴───┴───┴───┴───┴───┴───┘\n";
 }
+/* EXECUTION FUNCTIONS ============================================================================ */
 
 void E6502::CPU::reset()
 {
     std::cout << "RESETTING..." << "\n";
 
-    SP = 0x0FF;                    // Initialize Stack Pointer to 0xFF (0x1FF)
-    PC = 0xFFFC;                   // Initialize the reset vector address
-    C = Z = I = D = B = V = N = 0; // Clear Flags
-    A = X = Y = 0;                 // Clear other registers
+    SP = 0x0FF;    // Initialize Stack Pointer to 0xFF (0x1FF)
+    PC = 0xFFFC;   // Initialize the reset vector address
+    P &= 0;        // Clear Flags
+    A = X = Y = 0; // Clear other registers
 
     memory.init(); // Initialize memory
 
-    memory.write(0xFFFC, 0b01000001);
+    memory.write(0x2000, 0x69);
+    memory.write(0xFFFC, 0b10101100);
+    memory.write(0xFFFD, 0x00);
+    memory.write(0xFFFE, 0x20);
 }
 
-E6502::Byte E6502::CPU::fetchByte(int &cycles)
+/* INSTRUCTION FETCH FUNCTIONS ==================================================================== */
+
+E6502::Byte E6502::CPU::fetchByte()
 {
     Byte data = memory.read(PC);
 
     ++PC;
-    --cycles;
+    ++clkCycles;
 
     return data;
 }
 
-E6502::Word E6502::CPU::fetchWord(int &cycles)
+E6502::Word E6502::CPU::fetchWord()
 {
     /* IMPORTANT: 6502 IS LITTLE ENDIAN! */
     // This means that the order of the bytes is reversed in memory.
@@ -66,24 +76,26 @@ E6502::Word E6502::CPU::fetchWord(int &cycles)
     ++PC;
 
     // Check for platform endianness
-    if (BIG_ENDIAN_PLATFORM)
+    if (IS_BIG_ENDIAN_PLATFORM)
         swapBytesInWord(data);
 
-    cycles -= 2;
+    clkCycles += 2;
 
     return data;
 }
 
-E6502::Byte E6502::CPU::readByte(int &cycles, const Word &addr)
+/* MEMORY I/O FUNCTIONS =========================================================================== */
+
+E6502::Byte E6502::CPU::readByte(const Word &addr)
 {
     Byte data = memory.read(addr);
 
-    --cycles;
+    ++clkCycles;
 
     return data;
 }
 
-E6502::Word E6502::CPU::readWord(int &cycles, const Word &addr)
+E6502::Word E6502::CPU::readWord(const Word &addr)
 {
     /* IMPORTANT: 6502 IS LITTLE ENDIAN! */
     // This means that the order of the bytes is reversed in memory.
@@ -95,26 +107,20 @@ E6502::Word E6502::CPU::readWord(int &cycles, const Word &addr)
     data |= (memory.read(addr + 1) << 8);
 
     // Check for platform endianness
-    if (BIG_ENDIAN_PLATFORM)
+    if (IS_BIG_ENDIAN_PLATFORM)
         swapBytesInWord(data);
 
-    cycles -= 2;
+    clkCycles += 2;
 
     return data;
 }
 
-void E6502::CPU::writeWord(int &cycles, const Word &addr, const Word data)
+void E6502::CPU::writeWord(const Word &addr, const Word data)
 {
     memory.write(addr, data & 0x00FF); // Write lower bytes first.
     memory.write(addr + 1, data >> 8); // Write upper bytes last.
 
-    cycles -= 2;
-}
-
-void E6502::CPU::setLoadFlags()
-{
-    Z = (Byte)(A == 0);               // Sets zero flag if accumulator is zero.
-    N = (Byte)((A & 0b10000000) > 0); // Sets negative flag if seventh bit is 1
+    clkCycles += 2;
 }
 
 void E6502::CPU::swapBytesInWord(Word &word)
@@ -130,4 +136,15 @@ const bool E6502::CPU::pageCrossed(const Word &prev_addr, const Word &curr_addr)
     Byte previous_page = static_cast<Byte>(prev_addr >> 8); // Save the previous page
     Byte current_page = static_cast<Byte>(curr_addr >> 8);  // Save the current page
     return previous_page < current_page;
+}
+
+/* FLAGS FUNCTIONS ================================================================================ */
+
+void E6502::CPU::setLoadFlags(const Byte &reg)
+{
+    if (reg == 0)
+        P |= 0b00000010; // Sets zero flag if accumulator is zero.
+
+    if (reg & 0b10000000) // Sets negative flag if seventh bit is 1
+        P |= 0b10000000;
 }
