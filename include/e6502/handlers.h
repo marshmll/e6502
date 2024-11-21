@@ -37,7 +37,7 @@ namespace E6502
 
         const Byte performOperation(CPU &cpu, const AddressingModes &addr_mode, std::function<void(CPU &, const Byte &)> operation);
 
-        void branchHandler(CPU &cpu, const AddressingModes &addr_mode, const bool condition);
+        void branchHandler(CPU &cpu, const AddressingModes &addr_mode);
 
         void invalidHandler();
     };

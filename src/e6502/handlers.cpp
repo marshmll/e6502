@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "e6502/handlers.h"
-#include "handlers.h"
 
 void E6502::InstructionHandlers::ADCHandler(CPU &cpu, const AddressingModes &addr_mode)
 {
@@ -97,17 +96,20 @@ void E6502::InstructionHandlers::ASLHandler(CPU &cpu, const AddressingModes &add
 
 void E6502::InstructionHandlers::BCCHandler(CPU &cpu, const AddressingModes &addr_mode)
 {
-    branchHandler(cpu, addr_mode, (cpu.PC & CARRY_FLAG) == 0);
+    if ((cpu.P & CARRY_FLAG) == 0)
+        branchHandler(cpu, addr_mode);
 }
 
 void E6502::InstructionHandlers::BCSHandler(CPU &cpu, const AddressingModes &addr_mode)
 {
-    branchHandler(cpu, addr_mode, (cpu.PC & CARRY_FLAG) != 0);
+    if ((cpu.P & CARRY_FLAG) != 0)
+        branchHandler(cpu, addr_mode);
 }
 
 void E6502::InstructionHandlers::BEQHandler(CPU &cpu, const AddressingModes &addr_mode)
 {
-    branchHandler(cpu, addr_mode, (cpu.PC & ZERO_FLAG) != 0);
+    if ((cpu.P & ZERO_FLAG) != 0)
+        branchHandler(cpu, addr_mode);
 }
 
 void E6502::InstructionHandlers::LDAHandler(CPU &cpu, const AddressingModes &addr_mode)
@@ -309,32 +311,31 @@ const E6502::Byte E6502::InstructionHandlers::performOperation(CPU &cpu, const A
     return operand;
 }
 
-void E6502::InstructionHandlers::branchHandler(CPU &cpu, const AddressingModes &addr_mode, const bool condition)
+void E6502::InstructionHandlers::branchHandler(CPU &cpu, const AddressingModes &addr_mode)
 {
     Byte offset = getOperand(cpu, addr_mode);
 
-    if (condition == true)
+    std::cout << "offset: 0x" << std::hex << static_cast<int>(offset) << "\n";
+
+    cpu.clkCycles++;
+
+    if ((offset & 0b10000000) != 0)
     {
-        cpu.clkCycles++;
+        // Take the two's complement.
+        offset = ~offset;
+        offset += 0b00000001;
 
-        if ((offset & 0b10000000) != 0)
-        {
-            // Take the two's complement.
-            offset = ~offset;
-            offset += 0b00000001;
+        if (cpu.pageCrossed(cpu.PC, cpu.PC - offset))
+            cpu.clkCycles++;
 
-            if (cpu.pageCrossed(cpu.PC, cpu.PC - offset))
-                cpu.clkCycles++;
+        cpu.PC -= offset;
+    }
+    else
+    {
+        if (cpu.pageCrossed(cpu.PC, cpu.PC + offset))
+            cpu.clkCycles++;
 
-            cpu.PC -= offset;
-        }
-        else
-        {
-            if (cpu.pageCrossed(cpu.PC, cpu.PC + offset))
-                cpu.clkCycles++;
-
-            cpu.PC += offset;
-        }
+        cpu.PC += offset;
     }
 }
 
