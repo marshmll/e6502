@@ -153,6 +153,9 @@ ORA - 00011001
 SBC - 11111001
 STA - 10011001
 
+Indirect Mode
+JMP - 01101100
+
 Indirect X Addressing Mode - Can be handled with BITWISE AND 00011110 == 0 && AND 00000001 > 0
 ADC - 01100001
 AND - 00100001

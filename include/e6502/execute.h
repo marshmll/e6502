@@ -6,6 +6,5 @@
 
 namespace E6502
 {
-    class CPU;
     void handleInstruction(const E6502::Byte &opcode, E6502::CPU &cpu);
 }

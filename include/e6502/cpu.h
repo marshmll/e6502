@@ -15,6 +15,9 @@ namespace E6502
                    ZERO_FLAG = 0b00000010,
                    CARRY_FLAG = 0b00000001;
 
+    /* INTERRRUPT VECTOR */
+    constexpr Word INTERRUPT_VECTOR = 0xFFFE;
+
     /**
      * @class CPU
      *
@@ -151,24 +154,65 @@ namespace E6502
          */
         const bool pageCrossed(const Word &prev_addr, const Word &curr_addr);
 
-        /* FLAG FUNCTIONS ========================================================================= */
+        /**
+         * @brief Pushes data onto the top of the stack, then decrement SP.
+         * Does not change cycle count.
+         *
+         * @param data The data to push onto the stack.
+         *
+         * @return void
+         */
+        void pushByte(const Byte data);
 
         /**
-         * @brief Sets Z (zero) and N (negative) flags when loading
+         * @brief Pushes data onto the top of the stack, then decrement SP by 2.
+         * Does not change cycle count.
+         *
+         * @param data The data to push onto the stack.
+         *
+         * @return void
+         */
+        void pushWord(const Word data);
+
+        /**
+         * @brief Pops data from the top of the stack. Increments SP first.
+         * Does not change cycle count.
+         *
+         * @return const Byte.
+         */
+        const Byte popByte();
+
+        /**
+         * @brief Pops data from the top of the stack. Increments SP by 2 first.
+         * Does not change cycle count.
+         *
+         * @return const Word
+         */
+        const Word popWord();
+
+        /* FLAG FUNCTIONS ========================================================================= */
+
+        void setFlag(const Byte &flag, const bool &value);
+
+        const bool isFlagSet(const Byte &flag) const;
+
+        void updateADCFlags(const Byte &operand, const Byte &previous_A_value);
+
+        /**
+         * @brief Updates Z (zero) and N (negative) flags when loading
          * values into a register.
          * @attention Sets Z to 1 when loaded a zero value.
          * @attention Sets N to 1 when the seventh bit of the value
          * is 1.
          *
-         * @param reg The register to check.
+         * @param val The register or value to check.
          *
          * @return void
          */
+        void updateZeroAndNegativeFlags(const Byte &val);
 
-        void setADCFlags(const Byte &operand, const Byte &previous_A_value);
+        void updateSBCFlags(const Byte &operand, const Byte &previous_A_value);
 
-        void setZeroAndNegativeFlags(const Byte &reg);
-
-        void setSBCFlags(const Byte &operand, const Byte &previous_A_value);
+        void updateCompareFlags(const Byte &operand, const Byte &val);
     };
 }

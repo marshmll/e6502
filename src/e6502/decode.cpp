@@ -29,9 +29,10 @@ const E6502::Instructions E6502::decodeInstruction(const Byte &opcode)
 {
     for (auto &mask : instructionMasks)
     {
-        if (mask.zerosMask == mask.onesMask && mask.onesMask == opcode)
+        if (mask.zerosMask == mask.onesMask)
         {
-            return mask.instruction;
+            if (mask.onesMask == opcode)
+                return mask.instruction;
         }
         else if ((opcode & mask.zerosMask) == 0 && (opcode & mask.onesMask) == mask.onesMask)
         {
