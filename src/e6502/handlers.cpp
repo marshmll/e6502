@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "e6502/handlers.h"
-#include "handlers.h"
 
 void E6502::InstructionHandlers::ADCHandler(CPU &cpu, const AddressingModes &addr_mode)
 {

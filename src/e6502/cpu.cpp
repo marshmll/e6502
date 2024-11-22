@@ -47,8 +47,8 @@ void E6502::CPU::reset()
     memory.write(0xA001, 0xFF);
     memory.write(0xA002, 0xFF);
     memory.write(0xFFFC, ADC_IMMEDIATE);
-    memory.write(0xFFFD, 0x69);
-    memory.write(0xFFFE, 0xA0);
+    memory.write(0xFFFD, 0xFE);
+    memory.write(0xFFFE, TAX_IMPLIED);
 }
 
 /* INSTRUCTION FETCH FUNCTIONS ==================================================================== */
