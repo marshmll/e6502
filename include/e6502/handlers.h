@@ -184,8 +184,14 @@ namespace E6502
         {SED, InstructionHandler(&InstructionHandlers::SEDHandler)},
         {SEI, InstructionHandler(&InstructionHandlers::SEIHandler)},
         {STA, InstructionHandler(&InstructionHandlers::STAHandler)},
-        {STX, InstructionHandler(&InstructionHandlers::STAHandler)},
-        {STY, InstructionHandler(&InstructionHandlers::STAHandler)},
+        {STX, InstructionHandler(&InstructionHandlers::STXHandler)},
+        {STY, InstructionHandler(&InstructionHandlers::STYHandler)},
+        {TAX, InstructionHandler(&InstructionHandlers::TAXHandler)},
+        {TAY, InstructionHandler(&InstructionHandlers::TAYHandler)},
+        {TSX, InstructionHandler(&InstructionHandlers::TSXHandler)},
+        {TXA, InstructionHandler(&InstructionHandlers::TXAHandler)},
+        {TXS, InstructionHandler(&InstructionHandlers::TXSHandler)},
+        {TYA, InstructionHandler(&InstructionHandlers::TYAHandler)},        
     };
 
 };
