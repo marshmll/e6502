@@ -44,18 +44,24 @@ void E6502::InstructionHandlers::BCCHandler(CPU &cpu, const AddressingModes &add
 {
     if (!cpu.isFlagSet(CARRY_FLAG))
         branchHandler(cpu, addr_mode);
+    else
+        cpu.PC++;
 }
 
 void E6502::InstructionHandlers::BCSHandler(CPU &cpu, const AddressingModes &addr_mode)
 {
     if (cpu.isFlagSet(CARRY_FLAG))
         branchHandler(cpu, addr_mode);
+    else
+        cpu.PC++;
 }
 
 void E6502::InstructionHandlers::BEQHandler(CPU &cpu, const AddressingModes &addr_mode)
 {
     if (cpu.isFlagSet(ZERO_FLAG))
         branchHandler(cpu, addr_mode);
+    else
+        cpu.PC++;
 }
 
 void E6502::InstructionHandlers::BITHandler(CPU &cpu, const AddressingModes &addr_mode)
@@ -75,18 +81,24 @@ void E6502::InstructionHandlers::BMIHandler(CPU &cpu, const AddressingModes &add
 {
     if (cpu.isFlagSet(NEGATIVE_FLAG))
         branchHandler(cpu, addr_mode);
+    else
+        cpu.PC++;
 }
 
 void E6502::InstructionHandlers::BNEHandler(CPU &cpu, const AddressingModes &addr_mode)
 {
     if (!cpu.isFlagSet(ZERO_FLAG))
         branchHandler(cpu, addr_mode);
+    else
+        cpu.PC++;
 }
 
 void E6502::InstructionHandlers::BPLHandler(CPU &cpu, const AddressingModes &addr_mode)
 {
     if (!cpu.isFlagSet(NEGATIVE_FLAG))
         branchHandler(cpu, addr_mode);
+    else
+        cpu.PC++;
 }
 
 void E6502::InstructionHandlers::BRKHandler(CPU &cpu, const AddressingModes &addr_mode)
@@ -114,12 +126,16 @@ void E6502::InstructionHandlers::BVCHandler(CPU &cpu, const AddressingModes &add
 {
     if (!cpu.isFlagSet(OVERFLOW_FLAG))
         branchHandler(cpu, addr_mode);
+    else
+        cpu.PC++;
 }
 
 void E6502::InstructionHandlers::BVSHandler(CPU &cpu, const AddressingModes &addr_mode)
 {
     if (cpu.isFlagSet(OVERFLOW_FLAG))
         branchHandler(cpu, addr_mode);
+    else
+        cpu.PC++;
 }
 
 void E6502::InstructionHandlers::CLCHandler(CPU &cpu, const AddressingModes &addr_mode)
