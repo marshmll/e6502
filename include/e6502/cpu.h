@@ -7,16 +7,17 @@
 namespace E6502
 {
     /* PROCESSOR STATUS FLAGS BITMASKS */
-    constexpr Byte NEGATIVE_FLAG = 0b10000000,
-                   OVERFLOW_FLAG = 0b01000000,
-                   BREAK_FLAG = 0b00010000,
-                   DECIMAL_FLAG = 0b00001000,
-                   INTERRUPT_FLAG = 0b00000100,
-                   ZERO_FLAG = 0b00000010,
-                   CARRY_FLAG = 0b00000001;
+    constexpr Byte NEGATIVE_FLAG            = 0b10000000,
+                   OVERFLOW_FLAG            = 0b01000000,
+                   BREAK_FLAG               = 0b00010000,
+                   DECIMAL_FLAG             = 0b00001000,
+                   INTERRUPT_DISABLE_FLAG   = 0b00000100,
+                   ZERO_FLAG                = 0b00000010,
+                   CARRY_FLAG               = 0b00000001;
 
-    /* INTERRRUPT VECTOR */
-    constexpr Word INTERRUPT_VECTOR = 0xFFFE;
+    /* RESET AND INTERRRUPT VECTORS */
+    constexpr Word RESET_VECTOR     = 0xFFFC,
+                   INTERRUPT_VECTOR = 0xFFFE;
 
     /**
      * @class CPU

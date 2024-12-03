@@ -3,15 +3,22 @@
 
 void E6502::CPU::execute(int cycles)
 {
-    while (clkCycles < cycles)
+    unsigned long previous_clk = clkCycles;
+    system("clear");
+    while (true)
     {
-        std::cout << "PC: " << std::hex << "0x" << PC << "\n";
+        if (previous_clk >= clkCycles)
+        {
+            Byte opcode = fetchByte();
+            handleInstruction(opcode, *this);
+        }
 
-        Byte opcode = fetchByte();
+        std::cout << "[CLOCK]: " << std::dec << previous_clk << "\n";
+        printState();
 
-        std::cout << "opcode: 0x" << std::hex << static_cast<int>(opcode) << "\n";
-
-        handleInstruction(opcode, *this);
+        usleep(100000);
+        system("clear");
+        previous_clk++;
     }
 }
 
@@ -20,8 +27,8 @@ void E6502::handleInstruction(const Byte &opcode, CPU &cpu)
     Instructions instruction = lookupForInstruction(opcode);
     AddressingModes addr_mode = lookupForAddrMode(opcode);
 
-    std::cout << "instruction: " << std::dec << static_cast<int>(instruction) << "\n"
-              << "addressing mode: " << static_cast<int>(addr_mode) << "\n";
+    // std::cout << "instruction: " << std::dec << static_cast<int>(instruction) << "\n"
+    //           << "addressing mode: " << static_cast<int>(addr_mode) << "\n";
 
     try
     {
@@ -30,6 +37,6 @@ void E6502::handleInstruction(const Byte &opcode, CPU &cpu)
     }
     catch (const std::exception &e)
     {
-        std::cerr << "Invalid handler: " << e.what() << '\n';
+        std::cerr << "Invalid handler for opcode " << std::hex << static_cast<int>(opcode) << ": " << e.what() << '\n';
     }
 }

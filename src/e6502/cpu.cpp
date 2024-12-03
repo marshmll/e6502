@@ -28,27 +28,22 @@ void E6502::CPU::printState()
     std::cout << "├───┬───┬───┬───┬───┬───┬───┬───┤\n";
     std::cout << "│ N │ V │ - │ B │ D │ I │ Z │ C │\n";
     std::cout << "├───┼───┼───┼───┼───┼───┼───┼───┤\n";
-    std::cout << "│ " << static_cast<int>((P & NEGATIVE_FLAG) == NEGATIVE_FLAG) << " │ " << static_cast<int>((P & OVERFLOW_FLAG) == OVERFLOW_FLAG) << " │ - │ " << static_cast<int>((P & BREAK_FLAG) == BREAK_FLAG) << " │ " << static_cast<int>((P & DECIMAL_FLAG) == DECIMAL_FLAG) << " │ " << static_cast<int>((P & INTERRUPT_FLAG) == INTERRUPT_FLAG) << " │ " << static_cast<int>((P & ZERO_FLAG) == ZERO_FLAG) << " │ " << static_cast<int>((P & CARRY_FLAG) == CARRY_FLAG) << " │\n";
+    std::cout << "│ " << static_cast<int>((P & NEGATIVE_FLAG) == NEGATIVE_FLAG) << " │ " << static_cast<int>((P & OVERFLOW_FLAG) == OVERFLOW_FLAG) << " │ - │ " << static_cast<int>((P & BREAK_FLAG) == BREAK_FLAG) << " │ " << static_cast<int>((P & DECIMAL_FLAG) == DECIMAL_FLAG) << " │ " << static_cast<int>((P & INTERRUPT_DISABLE_FLAG) == INTERRUPT_DISABLE_FLAG) << " │ " << static_cast<int>((P & ZERO_FLAG) == ZERO_FLAG) << " │ " << static_cast<int>((P & CARRY_FLAG) == CARRY_FLAG) << " │\n";
     std::cout << "└───┴───┴───┴───┴───┴───┴───┴───┘\n";
 }
 /* EXECUTION FUNCTIONS ============================================================================ */
 
 void E6502::CPU::reset()
 {
-    std::cout << "RESETTING..." << "\n";
+    SP = 0x0FF;                            // Initialize Stack Pointer to 0xFF (0x1FF)
+    setFlag(INTERRUPT_DISABLE_FLAG, true); // Disable interrupts
+    setFlag(DECIMAL_FLAG, false);          // Clear decimal flag
+    setFlag(BREAK_FLAG, true);             // Set break flag
+    A = X = Y = 0;                         // Clear other registers
+    clkCycles = 7;                         // RESET takes 7 clock cycles.
+    PC = readWord(RESET_VECTOR);           // Read the program counter from RESET VECTOR
 
-    SP = 0x0FF;    // Initialize Stack Pointer to 0xFF (0x1FF)
-    PC = 0xFFFC;   // Initialize the reset vector address
-    P &= 0;        // Clear Flags
-    A = X = Y = 0; // Clear other registers
-
-    memory.init(); // Initialize memory
-
-    memory.write(0xA001, 0xFF);
-    memory.write(0xA002, 0xFF);
-    memory.write(0xFFFC, ADC_IMMEDIATE);
-    memory.write(0xFFFD, 0xFE);
-    memory.write(0xFFFE, TAX_IMPLIED);
+    std::cout << "RESETTING TO ADDRESS 0x" << std::hex << PC << "\n";
 }
 
 /* INSTRUCTION FETCH FUNCTIONS ==================================================================== */

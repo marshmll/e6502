@@ -94,11 +94,8 @@ void E6502::InstructionHandlers::BRKHandler(CPU &cpu, const AddressingModes &add
     cpu.PC++;
     cpu.clkCycles++;
 
-    cpu.pushByte((cpu.PC >> 8));
-    cpu.clkCycles++;
-
-    cpu.pushByte((cpu.PC & 0x00FF));
-    cpu.clkCycles++;
+    cpu.pushWord(cpu.PC);
+    cpu.clkCycles += 2;
 
     Byte processor_status = cpu.P;
     processor_status |= BREAK_FLAG;
@@ -106,7 +103,7 @@ void E6502::InstructionHandlers::BRKHandler(CPU &cpu, const AddressingModes &add
     cpu.pushByte(processor_status);
     cpu.clkCycles++;
 
-    cpu.setFlag(INTERRUPT_FLAG, true);
+    cpu.setFlag(INTERRUPT_DISABLE_FLAG, true);
     cpu.setFlag(BREAK_FLAG, false);
 
     Word interrupt_handler_addr = cpu.readWord(INTERRUPT_VECTOR);
@@ -139,7 +136,7 @@ void E6502::InstructionHandlers::CLDHandler(CPU &cpu, const AddressingModes &add
 
 void E6502::InstructionHandlers::CLIHandler(CPU &cpu, const AddressingModes &addr_mode)
 {
-    cpu.setFlag(INTERRUPT_FLAG, false);
+    cpu.setFlag(INTERRUPT_DISABLE_FLAG, false);
     cpu.clkCycles++;
 }
 
@@ -438,7 +435,7 @@ void E6502::InstructionHandlers::SEDHandler(CPU &cpu, const AddressingModes &add
 
 void E6502::InstructionHandlers::SEIHandler(CPU &cpu, const AddressingModes &addr_mode)
 {
-    cpu.setFlag(INTERRUPT_FLAG, true);
+    cpu.setFlag(INTERRUPT_DISABLE_FLAG, true);
     cpu.clkCycles++;
 }
 
