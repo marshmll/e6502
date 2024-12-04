@@ -51,9 +51,11 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
+[![E6502][cover]](https://github.com/marshmll/e6502)
+
 The E6502 emulator is a MOS 6502 CPU emulator that runs its instructions sets, emulates it's addressing modes, flags and every other functional aspect of the processor.
 
-The 6502 is a very famous and versatile processor, used in many applications in the 70's, as NES and Atari.
+The 6502 is a very famous and versatile processor, used in many known applications in the 70-80's, as NES and Atari.
 
 The processor works with a 16 bit memory bus width, supporting max 64 KiB memory size, though it's full capacity is rarely used. The E6502 Emulator also implements a ROM emulation with configurable memory size.
 
