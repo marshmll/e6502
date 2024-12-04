@@ -97,7 +97,7 @@ Install these dependencies in your machine.
 
 ### Creating your own ROM
 
-In the ```kernel``` folder, there is a sample of 6502 Assembly code and its compiled binary. To create your own ROM, it is recommended to use the [vasm](http://sun.hasenbraten.de/vasm/) assembler with old style mode configured.
+In the ```rom``` folder, there is a sample of 6502 Assembly code and its compiled binary. To create your own ROM, it is recommended to use the [vasm](http://sun.hasenbraten.de/vasm/) assembler with old style mode configured.
 
 <!-- CONTRIBUTING -->
 ## Contributing
